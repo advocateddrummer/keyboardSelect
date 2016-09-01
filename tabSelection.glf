@@ -6,7 +6,7 @@ grid [ttk::frame .f -padding "5 5 5 5"] -column 0 -row 0 -sticky nwes
 grid columnconfigure . 0 -weight 1
 grid rowconfigure    . 0 -weight 1
 
-set infoMessage "Spacebar - Cycle connectors \nEnter - Select connector \nEscape - Exit"
+set infoMessage "Spacebar - Cycle connectors \nEnter - Select connector \nEscape or Shift-Enter - Exit"
 
 grid [tk::message .f.m -textvariable infoMessage -background beige -bd 2 \
   -relief sunken -padx 5 -pady 5 -justify left -width 250] \
