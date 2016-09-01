@@ -9,8 +9,8 @@ grid rowconfigure    . 0 -weight 1
 set infoMessage "Spacebar - Cycle connectors \nEnter - Select connector \nEscape - Exit"
 
 grid [tk::message .f.m -textvariable infoMessage -background beige -bd 2 \
-        -relief sunken -padx 5 -pady 5 -justify left -width 250] \
-        -column 0 -row 1 -sticky ew
+  -relief sunken -padx 5 -pady 5 -justify left -width 250] \
+  -column 0 -row 1 -sticky ew
 
 foreach w [winfo children .f] {grid configure $w -padx 5 -pady 5}
 
@@ -22,87 +22,87 @@ bind all <KeyPress-Escape> {set e 1}
 
 proc HighlightConnectorWhite {con} {
 
-    $con setRenderAttribute ColorMode Entity
-    $con setColor "1 1 1"
+  $con setRenderAttribute ColorMode Entity
+  $con setColor "1 1 1"
 
 }
 
 proc HighlightConnectorYellow {con} {
 
-    $con setRenderAttribute ColorMode Entity
-    $con setColor "1 1 0"
+  $con setRenderAttribute ColorMode Entity
+  $con setColor "1 1 0"
 
 }
 
 proc ThickenConnector {con} {
 
-    $con setRenderAttribute ColorMode Entity
-    $con setRenderAttribute LineWidth 5
+  $con setRenderAttribute ColorMode Entity
+  $con setRenderAttribute LineWidth 5
 
-    pw::Display update
+  pw::Display update
 
 }
 
 proc GetConnectorInformation {con} {
 
-    set mode  [$con getRenderAttribute ColorMode]
-    set color [$con getColor]
-    set width [$con getRenderAttribute LineWidth]
+  set mode  [$con getRenderAttribute ColorMode]
+  set color [$con getColor]
+  set width [$con getRenderAttribute LineWidth]
 
-    return [list $mode $color $width]
+  return [list $mode $color $width]
 
 }
 
 proc ResetConnectorColor {con mode color} {
 
-    if {$mode eq "Automatic"} {
-        $con setRenderAttribute ColorMode $mode
-    } else {
-        $con setRenderAttribute ColorMode $mode
-        $con setColor $color
-    }
+  if {$mode eq "Automatic"} {
+    $con setRenderAttribute ColorMode $mode
+  } else {
+    $con setRenderAttribute ColorMode $mode
+    $con setColor $color
+  }
 
 }
 
 proc ResetConnectorLineWidth {con width} {
 
-    $con setRenderAttribute LineWidth $width
+  $con setRenderAttribute LineWidth $width
 
 }
 
 proc RemoveConnectorsFromList {conList cons} {
 
-    global conInfo
+  global conInfo
 
-    foreach con $cons {
+  foreach con $cons {
 
-        set idx [lsearch -exact $conList $con]
+    set idx [lsearch -exact $conList $con]
 
-        if {$idx >= 0} {
-            set conList [lreplace $conList $idx $idx]
-            ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
-            ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
-        }
-
+    if {$idx >= 0} {
+      set conList [lreplace $conList $idx $idx]
+      ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
+      ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
     }
 
-    return $conList
+  }
+
+  return $conList
 
 }
 
 proc GetAdjacentConnectors {con} {
 
-    global conInfo
+  global conInfo
 
-    set adjCons [pw::Connector getAdjacentConnectors $con]
-        foreach adjCon $adjCons {
-            if {![info exists conInfo($adjCon)]} {
-                set conInfo($adjCon) [GetConnectorInformation $adjCon]
-            }
-            HighlightConnectorYellow $adjCon
-        }
+  set adjCons [pw::Connector getAdjacentConnectors $con]
+  foreach adjCon $adjCons {
+    if {![info exists conInfo($adjCon)]} {
+      set conInfo($adjCon) [GetConnectorInformation $adjCon]
+    }
+    HighlightConnectorYellow $adjCon
+  }
 
-    return $adjCons
+  return $adjCons
 
 }
 
@@ -145,71 +145,71 @@ pw::Display update
 
 bind all <space> {
 
-    if {$i > 0} {
-        set previousConnector [lindex $adjCons $i-1]
-        ResetConnectorLineWidth $previousConnector [lindex $conInfo($previousConnector) 2]
-    }
+  if {$i > 0} {
+    set previousConnector [lindex $adjCons $i-1]
+    ResetConnectorLineWidth $previousConnector [lindex $conInfo($previousConnector) 2]
+  }
 
-    if {[llength $adjCons] == 1} {
-        set selectedConnector [lindex $adjCons 0]
-        ThickenConnector $selectedConnector
-    } else {
-        set selectedConnector [lindex $adjCons $i]
-        ThickenConnector $selectedConnector
-    }
+  if {[llength $adjCons] == 1} {
+    set selectedConnector [lindex $adjCons 0]
+    ThickenConnector $selectedConnector
+  } else {
+    set selectedConnector [lindex $adjCons $i]
+    ThickenConnector $selectedConnector
+  }
 
-    if {$i < [llength $adjCons]-1} {
-        incr i
-    } else {
-        set i 0
-        set lastConnector [lindex $adjCons end]
-        ResetConnectorLineWidth $lastConnector [lindex $conInfo($lastConnector) 2]
-    }
+  if {$i < [llength $adjCons]-1} {
+    incr i
+  } else {
+    set i 0
+    set lastConnector [lindex $adjCons end]
+    ResetConnectorLineWidth $lastConnector [lindex $conInfo($lastConnector) 2]
+  }
 
 }
 
 bind all <KeyPress-Return> {
 
-    lappend cons $selectedConnector
+  lappend cons $selectedConnector
 
-    foreach con $adjCons {
-        ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
-        ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
-    }
+  foreach con $adjCons {
+    ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
+    ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
+  }
 
-    set nextAdjCons [GetAdjacentConnectors $selectedConnector]
-    set nextAdjCons [RemoveConnectorsFromList $nextAdjCons $adjCons]
-    set adjCons [RemoveConnectorsFromList $nextAdjCons $cons]
+  set nextAdjCons [GetAdjacentConnectors $selectedConnector]
+  set nextAdjCons [RemoveConnectorsFromList $nextAdjCons $adjCons]
+  set adjCons [RemoveConnectorsFromList $nextAdjCons $cons]
 
-    foreach con $cons {
-        HighlightConnectorWhite $con
-    }
+  foreach con $cons {
+    HighlightConnectorWhite $con
+  }
 
-    if {[llength $adjCons] == 0} {
-        set e 1
-    }
+  if {[llength $adjCons] == 0} {
+    set e 1
+  }
 
-    CenterConnectors $adjCons
+  CenterConnectors $adjCons
 
-    set selectedConnector [lindex $adjCons 0]
-    ThickenConnector $selectedConnector
+  set selectedConnector [lindex $adjCons 0]
+  ThickenConnector $selectedConnector
 
-    set i 1
+  set i 1
 
-    pw::Display update
+  pw::Display update
 
 }
 
 vwait e
 
 foreach con $cons {
-    ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
-    ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
+  ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
+  ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
 }
 
 foreach con $adjCons {
-    ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
-    ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
+  ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
+  ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
 }
 
 # Set the final view so that all selected connectors are centered.
