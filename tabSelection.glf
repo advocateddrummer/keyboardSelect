@@ -19,6 +19,7 @@ focus -force .
 
 set e 0
 bind all <KeyPress-Escape> {set e 1}
+bind all <Shift-Return> {set e 1}
 
 proc HighlightConnectorWhite {con} {
 
