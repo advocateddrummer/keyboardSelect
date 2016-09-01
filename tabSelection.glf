@@ -133,7 +133,7 @@ HighlightConnectorWhite $selectedCon
 
 set adjCons [GetAdjacentConnectors $selectedCon]
 
-CenterConnectors $adjCons
+CenterConnectors [list {*}$adjCons {*}$selectedCon]
 
 set selectedConnector [lindex $adjCons 0]
 ThickenConnector $selectedConnector
@@ -189,7 +189,7 @@ bind all <KeyPress-Return> {
     set e 1
   }
 
-  CenterConnectors $adjCons
+  CenterConnectors [list {*}$adjCons {*}$selectedConnector]
 
   set selectedConnector [lindex $adjCons 0]
   ThickenConnector $selectedConnector
