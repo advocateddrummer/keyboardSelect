@@ -124,6 +124,7 @@ proc CenterConnectors {cons} {
   set retValue [pw::Display setCurrentView -animate 1 $zoomView]
 }
 
+set autocomplete true
 pw::Display getSelectedEntities resultVar
 
 set cons [lindex $resultVar(Connectors) 0]
@@ -186,11 +187,33 @@ bind all <KeyPress-Return> {
     HighlightConnectorWhite $con
   }
 
-  if {[llength $adjCons] == 0} {
-    set e 1
+  # A lousy excuse for do while loop
+  while {[llength $adjCons] == 1 && $autocomplete} {
+    set selectedConnector [lindex $adjCons 0]
+    lappend cons $selectedConnector
+
+    foreach con $adjCons {
+      ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
+      ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
+    }
+
+    set nextAdjCons [GetAdjacentConnectors $selectedConnector]
+    set nextAdjCons [RemoveConnectorsFromList $nextAdjCons $adjCons]
+    set adjCons [RemoveConnectorsFromList $nextAdjCons $cons]
+
+    foreach con $cons {
+      HighlightConnectorWhite $con
+    }
+
+    #CenterConnectors [list {*}$adjCons {*}$selectedConnector]
   }
 
   CenterConnectors [list {*}$adjCons {*}$selectedConnector]
+
+  # No more connectors
+  if {[llength $adjCons] == 0} {
+    set e 1
+  }
 
   set selectedConnector [lindex $adjCons 0]
   ThickenConnector $selectedConnector
