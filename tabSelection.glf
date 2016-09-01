@@ -106,6 +106,23 @@ proc GetAdjacentConnectors {con} {
 
 }
 
+# This procedure is *roughly* equivalent to hitting Shift-F2 on the keyboard.
+# It will center the connectors given by $cons in the screen.
+proc CenterConnectors {cons} {
+
+  set bbox [pwu::Extents empty]
+
+  foreach con $cons {
+    set bbox [pwu::Extents enclose $bbox [$con getExtents]]
+  }
+
+  # Create the new view.
+  set zoomView [pw::Display calculateView [pwu::Extents minimum $bbox] [pwu::Extents maximum $bbox]]
+
+  # Set the new view.
+  set retValue [pw::Display setCurrentView -animate 1 $zoomView]
+}
+
 pw::Display getSelectedEntities resultVar
 
 set cons [lindex $resultVar(Connectors) 0]
@@ -115,6 +132,8 @@ set conInfo($selectedCon) [GetConnectorInformation $selectedCon]
 HighlightConnectorWhite $selectedCon
 
 set adjCons [GetAdjacentConnectors $selectedCon]
+
+CenterConnectors $adjCons
 
 set selectedConnector [lindex $adjCons 0]
 ThickenConnector $selectedConnector
@@ -170,6 +189,8 @@ bind all <KeyPress-Return> {
         set e 1
     }
 
+    CenterConnectors $adjCons
+
     set selectedConnector [lindex $adjCons 0]
     ThickenConnector $selectedConnector
 
@@ -190,6 +211,9 @@ foreach con $adjCons {
     ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
     ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
 }
+
+# Set the final view so that all selected connectors are centered.
+CenterConnectors $cons
 
 pw::Display setSelectedEntities $cons
 
