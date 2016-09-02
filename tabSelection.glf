@@ -170,6 +170,18 @@ bind all <space> {
 
 }
 
+# Zoom/peek at the currently selected candidate connector.
+bind all <KeyPress-z> {
+  # Save the current view
+  #set preZoomView [pw::Display getCurrentView]
+  CenterConnectors $selectedConnector
+}
+
+# Zoom back out to view all current connectors.
+bind all <KeyPress-x> {
+  CenterConnectors [list {*}$adjCons {*}$selectedConnector]
+}
+
 bind all <KeyPress-Return> {
 
   lappend cons $selectedConnector
