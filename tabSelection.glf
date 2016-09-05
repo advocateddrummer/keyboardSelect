@@ -6,7 +6,7 @@ grid [ttk::frame .f -padding "5 5 5 5"] -column 0 -row 0 -sticky nwes
 grid columnconfigure . 0 -weight 1
 grid rowconfigure    . 0 -weight 1
 
-set infoMessage "Spacebar - Cycle connectors \nEnter - Select connector \nEscape or Shift-Enter - Exit"
+set infoMessage "Spacebar - Cycle connectors \nEnter - Select connector \nEscape - Abort \nShift-Enter - Exit"
 
 grid [tk::message .f.m -textvariable infoMessage -background beige -bd 2 \
   -relief sunken -padx 5 -pady 5 -justify left -width 250] \
@@ -17,8 +17,14 @@ foreach w [winfo children .f] {grid configure $w -padx 5 -pady 5}
 wm resizable . 0 0
 focus -force .
 
+# Save the current view
+set preScriptView [pw::Display getCurrentView]
+
 set e 0
-bind all <KeyPress-Escape> {set e 1}
+# Pressing Escape cancels/aborts the script.
+bind all <KeyPress-Escape> {set e -1}
+
+# Pressing Shift-Reset successfully exits the script.
 bind all <Shift-Return> {set e 1}
 
 proc HighlightConnectorWhite {con} {
@@ -248,9 +254,15 @@ foreach con $adjCons {
   ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
 }
 
-# Set the final view so that all selected connectors are centered.
-CenterConnectors $cons
-
-pw::Display setSelectedEntities $cons
+if {$e == 1} { # Success
+  # Set the final view so that all selected connectors are centered.
+  CenterConnectors $cons
+  pw::Display setSelectedEntities $cons
+} elseif {$e == -1} { # Abort
+  # Reset the original view.
+  set retValue [pw::Display setCurrentView -animate 1 $preScriptView]
+} else { # Something else
+  puts "Warning: received exit code <$e>"
+}
 
 exit
