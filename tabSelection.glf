@@ -114,9 +114,28 @@ proc CenterConnectors {cons} {
 }
 
 set autocomplete true
-pw::Display getSelectedEntities resultVar
 
-set cons [lindex $resultVar(Connectors) 0]
+#
+# Use selected connector or prompt user for selection if nothing is selected at
+# run time.
+#
+set mask [pw::Display createSelectionMask -requireConnector {}]
+
+if { !([pw::Display getSelectedEntities -selectionmask $mask selection]) } {
+  # No connector was selected at runtime; prompt for one now.
+
+  if { !([pw::Display selectEntities \
+         -selectionmask $mask \
+         -description "Select initial connector" \
+       selection]) } {
+
+    puts "Error: Unsuccessfully selected connector... exiting"
+    exit
+  }
+}
+
+# Only use the first connector if there are more than one selected.
+set cons [lindex $selection(Connectors) 0]
 
 set selectedCon $cons
 set conInfo($selectedCon) [GetConnectorInformation $selectedCon]
