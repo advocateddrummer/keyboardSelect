@@ -28,57 +28,44 @@ bind all <KeyPress-Escape> {set e -1}
 bind all <Shift-Return> {set e 1}
 
 proc HighlightConnectorWhite {con} {
-
   $con setRenderAttribute ColorMode Entity
   $con setColor "1 1 1"
-
 }
 
 proc HighlightConnectorYellow {con} {
-
   $con setRenderAttribute ColorMode Entity
   $con setColor "1 1 0"
-
 }
 
 proc ThickenConnector {con} {
-
   $con setRenderAttribute ColorMode Entity
   $con setRenderAttribute LineWidth 5
 
   pw::Display update
-
 }
 
 proc GetConnectorInformation {con} {
-
   set mode  [$con getRenderAttribute ColorMode]
   set color [$con getColor]
   set width [$con getRenderAttribute LineWidth]
 
   return [list $mode $color $width]
-
 }
 
 proc ResetConnectorColor {con mode color} {
-
   if {$mode eq "Automatic"} {
     $con setRenderAttribute ColorMode $mode
   } else {
     $con setRenderAttribute ColorMode $mode
     $con setColor $color
   }
-
 }
 
 proc ResetConnectorLineWidth {con width} {
-
   $con setRenderAttribute LineWidth $width
-
 }
 
 proc RemoveConnectorsFromList {conList cons} {
-
   global conInfo
 
   foreach con $cons {
@@ -94,11 +81,9 @@ proc RemoveConnectorsFromList {conList cons} {
   }
 
   return $conList
-
 }
 
 proc GetAdjacentConnectors {con} {
-
   global conInfo
 
   set adjCons [pw::Connector getAdjacentConnectors $con]
@@ -110,13 +95,11 @@ proc GetAdjacentConnectors {con} {
   }
 
   return $adjCons
-
 }
 
 # This procedure is *roughly* equivalent to hitting Shift-F2 on the keyboard.
 # It will center the connectors given by $cons in the screen.
 proc CenterConnectors {cons} {
-
   set bbox [pwu::Extents empty]
 
   foreach con $cons {
@@ -152,7 +135,6 @@ set n 0
 pw::Display update
 
 bind all <space> {
-
   if {$i > 0} {
     set previousConnector [lindex $adjCons $i-1]
     ResetConnectorLineWidth $previousConnector [lindex $conInfo($previousConnector) 2]
@@ -173,7 +155,6 @@ bind all <space> {
     set lastConnector [lindex $adjCons end]
     ResetConnectorLineWidth $lastConnector [lindex $conInfo($lastConnector) 2]
   }
-
 }
 
 # Zoom/peek at the currently selected candidate connector.
@@ -189,7 +170,6 @@ bind all <KeyPress-x> {
 }
 
 bind all <KeyPress-Return> {
-
   lappend cons $selectedConnector
 
   foreach con $adjCons {
@@ -239,7 +219,6 @@ bind all <KeyPress-Return> {
   set i 1
 
   pw::Display update
-
 }
 
 vwait e
