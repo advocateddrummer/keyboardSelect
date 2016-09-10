@@ -23,11 +23,12 @@ set preScriptView [pw::Display getCurrentView]
 # Parameterize the animation speed
 set animationSpeed 0.25
 
+# Exit variable/code; -1 means abort, 1 means success.
 set e 0
 # Pressing Escape cancels/aborts the script.
 bind all <KeyPress-Escape> {set e -1}
 
-# Pressing Shift-Reset successfully exits the script.
+# Pressing Shift-Return successfully exits the script.
 bind all <Shift-Return> {set e 1}
 
 proc HighlightConnectorWhite {con} {
@@ -209,7 +210,8 @@ bind all <KeyPress-Return> {
     HighlightConnectorWhite $con
   }
 
-  # A lousy excuse for do while loop
+  # A lousy excuse for do-while loop that facilitates the 'autocompletion'
+  # feature.
   while {[llength $adjCons] == 1 && $autocomplete} {
     set selectedConnector [lindex $adjCons 0]
     lappend cons $selectedConnector
