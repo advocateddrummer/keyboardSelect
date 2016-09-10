@@ -25,6 +25,17 @@ set animationSpeed 0.25
 
 # Exit variable/code; -1 means abort, 1 means success.
 set e 0
+
+# Counter to track number of connectors selected by the user by pressing enter.
+set selectionCount 0
+
+# This parameter controls whether or not the script detects that the user has
+# selected a loop and terminates. If the user wants to use this script to
+# select closed loops this should be set to 'true', if however, the user just
+# wants to select some connected connectors and not to end if they close the
+# loop, this should be set to 'false'.
+set detectLoop true
+
 # Pressing Escape cancels/aborts the script.
 bind all <KeyPress-Escape> {set e -1}
 
@@ -213,6 +224,26 @@ bind all <<select>> {
 
   set nextAdjCons [GetAdjacentConnectors $selectedConnector]
   set nextAdjCons [RemoveConnectorsFromList $nextAdjCons $adjCons]
+
+  # Does the script need to detect if it has closed a loop?
+  if {$detectLoop} {
+    # If the original connector exists now in the nextAdjCons list the loop is
+    # complete/closed.
+    set idx [lsearch -exact $nextAdjCons [lindex $cons 0]]
+    if {$idx >= 0 && $selectionCount != 1} {
+      set e 1
+
+      # This is a bit messy and needs to be here so that all connectors have
+      # their original size/color when the script completes.
+      foreach con $nextAdjCons {
+        ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
+        ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
+      }
+
+      return
+    }
+  }
+
   set adjCons [RemoveConnectorsFromList $nextAdjCons $cons]
 
   foreach con $cons {
