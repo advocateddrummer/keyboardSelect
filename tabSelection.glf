@@ -194,7 +194,12 @@ bind all <KeyPress-x> {
   CenterConnectors [list {*}$adjCons {*}$selectedConnector]
 }
 
-bind all <KeyPress-Return> {
+# Both the normal Enter/Return key and the Enter key on the numeric keypad will
+# work here.
+event add <<select>> <KeyPress-KP_Enter> <KeyPress-Return>
+bind all <<select>> {
+  incr selectionCount
+
   lappend cons $selectedConnector
 
   foreach con $adjCons {
