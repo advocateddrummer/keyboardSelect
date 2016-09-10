@@ -20,6 +20,9 @@ focus -force .
 # Save the current view
 set preScriptView [pw::Display getCurrentView]
 
+# Parameterize the animation speed
+set animationSpeed 0.25
+
 set e 0
 # Pressing Escape cancels/aborts the script.
 bind all <KeyPress-Escape> {set e -1}
@@ -100,6 +103,8 @@ proc GetAdjacentConnectors {con} {
 # This procedure is *roughly* equivalent to hitting Shift-F2 on the keyboard.
 # It will center the connectors given by $cons in the screen.
 proc CenterConnectors {cons} {
+  global animationSpeed
+
   set bbox [pwu::Extents empty]
 
   foreach con $cons {
@@ -110,7 +115,7 @@ proc CenterConnectors {cons} {
   set zoomView [pw::Display calculateView [pwu::Extents minimum $bbox] [pwu::Extents maximum $bbox]]
 
   # Set the new view.
-  set retValue [pw::Display setCurrentView -animate 1 $zoomView]
+  set retValue [pw::Display setCurrentView -animate $animationSpeed $zoomView]
 }
 
 set autocomplete true
