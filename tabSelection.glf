@@ -159,6 +159,10 @@ set n 0
 
 pw::Display update
 
+# I cannot figure out how to also bind <Tab> to this functionality; creating a
+# virtual event like the one used to select connectors does not work here with
+# <Tab> for some reason. Note that replacing <space> with <Tab> in the binding
+# below works, but I want to also have <space> work too.
 bind all <space> {
   if {$i > 0} {
     set previousConnector [lindex $adjCons $i-1]
