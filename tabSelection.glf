@@ -1,12 +1,23 @@
 package require PWI_Glyph
 pw::Script loadTk
 
-wm title . "Selection"
+# This option allows for customization of the 'cycle' key; by default it is the
+# Tab key, but it may be set to the Spacebar by replacing 'Tab' with 'space'.
+# NOTE: only 'Tab' and 'space' are currently supported.
+set cycleKey Tab
+
+wm title . "Selection Script"
 grid [ttk::frame .f -padding "5 5 5 5"] -column 0 -row 0 -sticky nwes
 grid columnconfigure . 0 -weight 1
 grid rowconfigure    . 0 -weight 1
 
-set infoMessage "Spacebar - Cycle connectors \nEnter - Select connector \nEscape - Abort \nShift-Enter - Exit"
+# Set 'cycleKey' to 'Tab' if it is not either 'Tab' nor 'space'
+if {![string compare "Tab" $cycleKey] && ![string compare "space" $cycleKey]} {
+  set cycleKey Tab
+}
+
+set cycleString [expr ![string compare "Tab" $cycleKey]?"Tab":"Spacebar"]
+set infoMessage [concat $cycleString " - Cycle connectors \nEnter - Select connector \nEscape - Abort \nShift-Enter - Exit"]
 
 grid [tk::message .f.m -textvariable infoMessage -background beige -bd 2 \
   -relief sunken -padx 5 -pady 5 -justify left -width 250] \
@@ -182,11 +193,10 @@ set n 0
 
 pw::Display update
 
-# I cannot figure out how to also bind <Tab> to this functionality; creating a
-# virtual event like the one used to select connectors does not work here with
-# <Tab> for some reason. Note that replacing <space> with <Tab> in the binding
-# below works, but I want to also have <space> work too.
-bind all <space> {
+# I would like to figure out how to bind both <Tab> and <space> to this
+# functionality; creating a virtual event like the one used to select
+# connectors does not work here with <Tab> for some reason.
+bind all <$cycleKey> {
   if {$i > 0} {
     set previousConnector [lindex $adjCons $i-1]
     ResetConnectorLineWidth $previousConnector [lindex $conInfo($previousConnector) 2]
