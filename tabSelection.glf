@@ -42,6 +42,18 @@ bind all <KeyPress-Escape> {set e -1}
 # Pressing Shift-Return successfully exits the script.
 bind all <Shift-Return> {set e 1}
 
+# I found this tcl do-while loop implementation at
+# https://groups.google.com/forum/#!topic/comp.lang.tcl/dSZW_ngNCyo
+# and I do not understand how it works, but it does seem to work!
+proc do {body while condition} {
+  if {![string match "while" $while]} {
+    error "incorrect 'do-while' usage: should be do body while condition"
+  }
+
+  set body "$body\nif {$condition} {continue} {break}"
+  uplevel [list while 1 $body]
+}
+
 proc HighlightConnectorWhite {con} {
   $con setRenderAttribute ColorMode Entity
   $con setColor "1 1 1"
@@ -215,45 +227,7 @@ event add <<select>> <KeyPress-KP_Enter> <KeyPress-Return>
 bind all <<select>> {
   incr selectionCount
 
-  lappend cons $selectedConnector
-
-  foreach con $adjCons {
-    ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
-    ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
-  }
-
-  set nextAdjCons [GetAdjacentConnectors $selectedConnector]
-  set nextAdjCons [RemoveConnectorsFromList $nextAdjCons $adjCons]
-
-  # Does the script need to detect if it has closed a loop?
-  if {$detectLoop} {
-    # If the original connector exists now in the nextAdjCons list the loop is
-    # complete/closed.
-    set idx [lsearch -exact $nextAdjCons [lindex $cons 0]]
-    if {$idx >= 0 && $selectionCount != 1} {
-      set e 1
-
-      # This is a bit messy and needs to be here so that all connectors have
-      # their original size/color when the script completes.
-      foreach con $nextAdjCons {
-        ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
-        ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
-      }
-
-      return
-    }
-  }
-
-  set adjCons [RemoveConnectorsFromList $nextAdjCons $cons]
-
-  foreach con $cons {
-    HighlightConnectorWhite $con
-  }
-
-  # A lousy excuse for do-while loop that facilitates the 'autocompletion'
-  # feature.
-  while {[llength $adjCons] == 1 && $autocomplete} {
-    set selectedConnector [lindex $adjCons 0]
+  do {
     lappend cons $selectedConnector
 
     foreach con $adjCons {
@@ -263,14 +237,35 @@ bind all <<select>> {
 
     set nextAdjCons [GetAdjacentConnectors $selectedConnector]
     set nextAdjCons [RemoveConnectorsFromList $nextAdjCons $adjCons]
+
+    # Does the script need to detect if it has closed a loop?
+    if {$detectLoop} {
+    # If the original connector exists now in the nextAdjCons list the loop is
+    # complete/closed.
+      set idx [lsearch -exact $nextAdjCons [lindex $cons 0]]
+      if {$idx >= 0 && $selectionCount != 1} {
+        set e 1
+
+        # This is a bit messy and needs to be here so that all connectors have
+        # their original size/color when the script completes.
+        foreach con $nextAdjCons {
+          ResetConnectorColor $con [lindex $conInfo($con) 0] [lindex $conInfo($con) 1]
+          ResetConnectorLineWidth $con [lindex $conInfo($con) 2]
+        }
+
+        return
+      }
+    }
+
     set adjCons [RemoveConnectorsFromList $nextAdjCons $cons]
 
     foreach con $cons {
       HighlightConnectorWhite $con
     }
 
-    #CenterConnectors [list {*}$adjCons {*}$selectedConnector]
-  }
+    set selectedConnector [lindex $adjCons 0]
+
+  } while {([llength $adjCons] == 1) && $autocomplete}
 
   CenterConnectors [list {*}$adjCons {*}$selectedConnector]
 
