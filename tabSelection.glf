@@ -231,6 +231,16 @@ bind all <KeyPress-x> {
   CenterConnectors [list {*}$adjCons {*}$selectedConnector]
 }
 
+# Zoom out to view all currently selected connectors.
+bind all <KeyPress-b> {
+  CenterConnectors [list {*}$cons {*}$adjCons {*}$selectedConnector]
+}
+
+# Zoom out to original view: the view when the script was launched.
+bind all <KeyPress-r> {
+  set retValue [pw::Display setCurrentView -animate $animationSpeed $preScriptView]
+}
+
 # Both the normal Enter/Return key and the Enter key on the numeric keypad will
 # work here.
 event add <<select>> <KeyPress-KP_Enter> <KeyPress-Return>
