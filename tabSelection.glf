@@ -2,18 +2,18 @@ package require PWI_Glyph
 pw::Script loadTk
 
 # This option allows for customization of the 'cycle' key; by default it is the
-# Tab key, but it may be set to the Spacebar by replacing 'Tab' with 'space'.
-# NOTE: only 'Tab' and 'space' are currently supported.
-set cycleKey Tab
+# Spacebar, but it may be set to the Tab key by replacing 'space' with 'Tab'.
+# NOTE: only 'space' and 'Tab' are currently supported.
+set cycleKey space
 
 wm title . "Selection Script"
 grid [ttk::frame .f -padding "5 5 5 5"] -column 0 -row 0 -sticky nwes
 grid columnconfigure . 0 -weight 1
 grid rowconfigure    . 0 -weight 1
 
-# Set 'cycleKey' to 'Tab' if it is not either 'Tab' nor 'space'
+# Set 'cycleKey' to 'space' if it is not either 'Tab' nor 'space'
 if {![string compare "Tab" $cycleKey] && ![string compare "space" $cycleKey]} {
-  set cycleKey Tab
+  set cycleKey space
 }
 
 set cycleString [expr ![string compare "Tab" $cycleKey]?"Tab":"Spacebar"]
