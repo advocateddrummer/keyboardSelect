@@ -185,9 +185,15 @@ set cons [lindex $selection(Connectors) 0]
 
 set selectedCon $cons
 set conInfo($selectedCon) [GetConnectorInformation $selectedCon]
-HighlightConnectorWhite $selectedCon
 
 set adjCons [GetAdjacentConnectors $selectedCon]
+
+if { [llength $adjCons] == 0 } {
+  puts "Error: there are no adjacent connectors... exiting"
+  exit
+}
+
+HighlightConnectorWhite $selectedCon
 
 pw::Display zoomToEntities -animate $animationSpeed [list {*}$adjCons {*}$selectedCon]
 
