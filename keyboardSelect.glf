@@ -193,6 +193,32 @@ if { [llength $adjCons] == 0 } {
   exit
 }
 
+# Support auto-completion before reaching do loop below, i.e., after selecting
+# initial connector. This functionality should be encapsulated into a procedure
+# as it is repeated.
+while { [llength $adjCons] == 1 && $autocomplete } {
+  # Reset attributes of single adjacent connector.
+  set adjCon [lindex $adjCons 0]
+  ResetConnectorColor $adjCon [lindex $conInfo($adjCon) 0] [lindex $conInfo($adjCon) 1]
+  ResetConnectorLineWidth $adjCon [lindex $conInfo($adjCon) 2]
+
+  # New current connector is the single adjacent connector.
+  #set selectedCon [lindex $adjCons 0]
+  set selectedCon $adjCon
+
+  # Save new connector.
+  lappend cons $selectedCon
+
+  # Get new list of adjacent connector(s).
+  set adjCons [GetAdjacentConnectors $selectedCon]
+  set adjCons [RemoveConnectorsFromList $adjCons $cons]
+
+  # Finally, highlight newest current connector.
+  foreach con $cons {
+    HighlightConnectorWhite $con
+  }
+}
+
 HighlightConnectorWhite $selectedCon
 
 pw::Display zoomToEntities -animate $animationSpeed [list {*}$adjCons {*}$selectedCon]
