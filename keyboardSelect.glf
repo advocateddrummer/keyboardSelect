@@ -201,7 +201,6 @@ set selectedConnector [lindex $adjCons 0]
 ThickenConnector $selectedConnector
 
 set i 1
-set n 0
 
 pw::Display update
 
