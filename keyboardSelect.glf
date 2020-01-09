@@ -11,7 +11,7 @@ grid [ttk::frame .f -padding "5 5 5 5"] -column 0 -row 0 -sticky nwes
 grid columnconfigure . 0 -weight 1
 grid rowconfigure    . 0 -weight 1
 
-# Set 'cycleKey' to 'space' if it is not either 'Tab' nor 'space'
+# Set 'cycleKey' to 'space' if it is not neither 'Tab' nor 'space'
 if {![string compare "Tab" $cycleKey] && ![string compare "space" $cycleKey]} {
   set cycleKey space
 }
