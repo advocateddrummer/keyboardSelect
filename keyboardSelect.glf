@@ -140,6 +140,10 @@ proc GetAdjacentConnectors {con} {
 proc CenterConnectors {cons} {
   global animationSpeed
 
+  # This function should return if there are no connectors in the list as might
+  # happen if we have reached the end of an unclosed set of connectors.
+  if { [llength $cons] == 0 } { return }
+
   set bbox [pwu::Extents empty]
 
   foreach con $cons {
