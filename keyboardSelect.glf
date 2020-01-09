@@ -137,25 +137,27 @@ proc GetAdjacentConnectors {con} {
 
 # This procedure is *roughly* equivalent to hitting Shift-F2 on the keyboard.
 # It will center the connectors given by $cons in the screen.
-proc CenterConnectors {cons} {
-  global animationSpeed
-
-  # This function should return if there are no connectors in the list as might
-  # happen if we have reached the end of an unclosed set of connectors.
-  if { [llength $cons] == 0 } { return }
-
-  set bbox [pwu::Extents empty]
-
-  foreach con $cons {
-    set bbox [pwu::Extents enclose $bbox [$con getExtents]]
-  }
-
-  # Create the new view.
-  set zoomView [pw::Display calculateView [pwu::Extents minimum $bbox] [pwu::Extents maximum $bbox]]
-
-  # Set the new view.
-  set retValue [pw::Display setCurrentView -animate $animationSpeed $zoomView]
-}
+# NOTE: this procedure has been obsoleted by the pw::Display zoomToEntities
+# function which I just found out about.
+#proc CenterConnectors {cons} {
+#  global animationSpeed
+#
+#  # This function should return if there are no connectors in the list as might
+#  # happen if we have reached the end of an unclosed set of connectors.
+#  if { [llength $cons] == 0 } { return }
+#
+#  set bbox [pwu::Extents empty]
+#
+#  foreach con $cons {
+#    set bbox [pwu::Extents enclose $bbox [$con getExtents]]
+#  }
+#
+#  # Create the new view.
+#  set zoomView [pw::Display calculateView [pwu::Extents minimum $bbox] [pwu::Extents maximum $bbox]]
+#
+#  # Set the new view.
+#  set retValue [pw::Display setCurrentView -animate $animationSpeed $zoomView]
+#}
 
 set autocomplete true
 
@@ -187,7 +189,7 @@ HighlightConnectorWhite $selectedCon
 
 set adjCons [GetAdjacentConnectors $selectedCon]
 
-CenterConnectors [list {*}$adjCons {*}$selectedCon]
+pw::Display zoomToEntities -animate $animationSpeed [list {*}$adjCons {*}$selectedCon]
 
 set selectedConnector [lindex $adjCons 0]
 ThickenConnector $selectedConnector
@@ -227,17 +229,17 @@ bind all <$cycleKey> {
 bind all <KeyPress-z> {
   # Save the current view
   #set preZoomView [pw::Display getCurrentView]
-  CenterConnectors $selectedConnector
+  pw::Display zoomToEntities $selectedConnector
 }
 
 # Zoom back out to view all current connectors.
 bind all <KeyPress-x> {
-  CenterConnectors [list {*}$adjCons {*}$selectedConnector]
+  pw::Display zoomToEntities [list {*}$adjCons {*}$selectedConnector]
 }
 
 # Zoom out to view all currently selected connectors.
 bind all <KeyPress-b> {
-  CenterConnectors [list {*}$cons {*}$adjCons {*}$selectedConnector]
+  pw::Display zoomToEntities [list {*}$cons {*}$adjCons {*}$selectedConnector]
 }
 
 # Zoom out to original view: the view when the script was launched.
@@ -291,7 +293,7 @@ bind all <<select>> {
 
   } while {([llength $adjCons] == 1) && $autocomplete}
 
-  CenterConnectors [list {*}$adjCons {*}$selectedConnector]
+  pw::Display zoomToEntities -animate $animationSpeed [list {*}$adjCons {*}$selectedConnector]
 
   # No more connectors
   if {[llength $adjCons] == 0} {
@@ -320,7 +322,7 @@ foreach con $adjCons {
 
 if {$e == 1} { # Success
   # Set the final view so that all selected connectors are centered.
-  CenterConnectors $cons
+  pw::Display zoomToEntities $cons
   pw::Display setSelectedEntities $cons
 } elseif {$e == -1} { # Abort
   # Reset the original view.
