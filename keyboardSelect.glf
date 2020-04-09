@@ -79,6 +79,10 @@ proc ThickenConnector {con} {
   $con setRenderAttribute ColorMode Entity
   $con setRenderAttribute LineWidth 5
 
+  # This enables the connector to be visible even if obscured by other grid
+  # entities. This did not work until Pointwise V18.3 R2C6.
+  pw::Display setSelectedEntities $con
+
   pw::Display update
 }
 
